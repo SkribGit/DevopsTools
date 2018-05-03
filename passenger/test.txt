@@ -1,0 +1,42 @@
+Version: 4.0.42
+Date   : 2018-04-29 01:39:20 -0400
+------------- Apache processes -------------
+*** WARNING: The Apache executable cannot be found.
+Please set the APXS2 environment variable to your 'apxs2' executable's filename, or set the HTTPD environment variable to your 'httpd' or 'apache2' executable's filename.
+
+
+-------- Nginx processes ---------
+PID  PPID  VMSize   Private  Name
+----------------------------------
+866  1     45.5 MB  ?        nginx: master process /opt/nginx/sbin/nginx
+867  866   47.4 MB  ?        nginx: worker process
+869  866   47.5 MB  ?        nginx: worker process
+870  866   47.4 MB  ?        nginx: worker process
+871  866   47.3 MB  ?        nginx: worker process
+872  866   47.3 MB  ?        nginx: worker process
+874  866   47.4 MB  ?        nginx: worker process
+875  866   47.3 MB  ?        nginx: worker process
+879  866   47.7 MB  ?        nginx: worker process
+880  866   47.5 MB  ?        nginx: worker process
+883  866   47.4 MB  ?        nginx: worker process
+885  866   47.6 MB  ?        nginx: worker process
+886  866   47.5 MB  ?        nginx: worker process
+887  866   47.5 MB  ?        nginx: worker process
+888  866   47.6 MB  ?        nginx: worker process
+889  866   47.4 MB  ?        nginx: worker process
+890  866   47.4 MB  ?        nginx: worker process
+### Processes: 17
+### Total private dirty RSS: 0.00 MB (?)
+
+
+----- Passenger processes ------
+PID    VMSize     Private  Name
+--------------------------------
+846    218.3 MB   ?        PassengerWatchdog
+849    1658.2 MB  ?        PassengerHelperAgent
+858    230.8 MB   ?        PassengerLoggingAgent
+15672  878.7 MB   ?        Passenger RackApp: /home/chouxbox/current
+### Processes: 4
+### Total private dirty RSS: 0.00 MB (?)
+*** WARNING: Please run this tool with rvmsudo. Otherwise the private dirty RSS (a reliable metric for real memory usage) of processes cannot be determined.
+
