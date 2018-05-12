@@ -8,13 +8,41 @@ import (
   "log"
   "os"
   "os/exec"
+  "strconv"
   "strings"
 )
+
+type worker struct {
+  pid string
+  memory int
+}
+
+func get_passenger_workers(scanner *bufio.Scanner) []worker {
+  workers := []worker{}
+  for scanner.Scan() {
+    if strings.Contains(scanner.Text(), "RackApp") {
+      s := strings.Fields(scanner.Text())
+      pid := s[0]
+      mem, err := strconv.ParseFloat(s[1], 64)
+      w := worker{pid: pid, memory: int(mem)}
+      workers = append(workers, w)
+      if err != nil {
+        log.Fatal(err)
+      }
+    }
+  }
+  if err := scanner.Err(); err != nil {
+    log.Fatal(err)
+  }
+  return workers
+}
 
 func main() {
   var memoryLimit int
   var runMode string
   var testFilename string
+
+  var workers []worker
 
   flag.IntVar(&memoryLimit, "limit", 500, "worker memory limit")
   flag.StringVar(&runMode, "mode", "dryrun", "run mode")
@@ -22,8 +50,9 @@ func main() {
 
   flag.Parse()
 
-  // read input from test file if it was supplied
   if runMode == "test" && testFilename != "" {
+    // Test mode
+    // Read input from input file
     fmt.Println("Running in test mode.")
     fmt.Printf("Reading input from %s\n", testFilename)
 
@@ -35,24 +64,15 @@ func main() {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-      if strings.Contains(scanner.Text(), "RackApp") {
-        // extract the size of the worker
-        // extract the PID
-        fmt.Println(scanner.Text())
+    workers = get_passenger_workers(scanner)
+    for _, worker := range workers {
+      if worker.memory > memoryLimit {
+        fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
       }
     }
-    if err := scanner.Err(); err != nil {
-      log.Fatal(err)
-    }
   } else {
-
-
-  // run mode
-  // dry run - do nothing, but print PIDs that will be terminated
-  // live - actually terminate the PIDs
-
-  // run passenger-memory-stats and parse the output of the command
+    // Live mode
+    // run passenger-memory-stats and parse the output of the command
     cmd := exec.Command("passenger-memory-stats")
     cmdReader, err := cmd.Output()
     if err != nil {
@@ -60,11 +80,12 @@ func main() {
     }
     fmt.Printf("Terminating workers that exceed the %dMB limit\n", memoryLimit)
     scanner := bufio.NewScanner(bytes.NewReader(cmdReader))
-    for scanner.Scan() {
-      if strings.Contains(scanner.Text(), "RackApp") {
-        fmt.Println(scanner.Text())
+    workers = get_passenger_workers(scanner)
+    for _, worker := range workers {
+      if worker.memory > memoryLimit {
+        fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
+        // TODO: issue the kill command
       }
     }
   }
-
 }
