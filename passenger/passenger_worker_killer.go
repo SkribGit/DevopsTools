@@ -17,6 +17,10 @@ type worker struct {
   memory int
 }
 
+func get_kill_string(pid string) string {
+  return fmt.Sprintf("kill -6 %s", pid)
+}
+
 func get_worker_signature(_passengerVersion string) string {
   switch _passengerVersion {
   case "5":
@@ -83,6 +87,8 @@ func main() {
     for _, worker := range workers {
       if worker.memory > memoryLimit {
         fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
+        killString := get_kill_string(worker.pid)
+        fmt.Println(killString)
       }
     }
   } else {
@@ -99,7 +105,12 @@ func main() {
     for _, worker := range workers {
       if worker.memory > memoryLimit {
         fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
-        // TODO: issue the kill command
+        killString := get_kill_string(worker.pid)
+        killCmd := exec.Command(killString)
+        killErr := killCmd.Run()
+        if killErr != nil {
+          log.Fatal(killErr)
+        }
       }
     }
   }
