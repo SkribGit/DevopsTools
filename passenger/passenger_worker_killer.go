@@ -17,10 +17,23 @@ type worker struct {
   memory int
 }
 
-func get_passenger_workers(scanner *bufio.Scanner) []worker {
+func get_worker_signature(_passengerVersion string) string {
+  switch _passengerVersion {
+  case "5":
+    return "Passenger AppPreloader"
+  case "4":
+    return "Passenger RackApp"
+  default:
+    return "Passenger RackApp"
+  }
+}
+
+func get_passenger_workers(scanner *bufio.Scanner, _passengerVersion string) []worker {
   workers := []worker{}
+  worker_signature := get_worker_signature(_passengerVersion)
+
   for scanner.Scan() {
-    if strings.Contains(scanner.Text(), "RackApp") {
+    if strings.Contains(scanner.Text(), worker_signature) {
       s := strings.Fields(scanner.Text())
       pid := s[0]
       mem, err := strconv.ParseFloat(s[1], 64)
@@ -41,12 +54,14 @@ func main() {
   var memoryLimit int
   var runMode string
   var testFilename string
+  var passengerVersion string
 
   var workers []worker
 
   flag.IntVar(&memoryLimit, "limit", 500, "worker memory limit")
   flag.StringVar(&runMode, "mode", "dryrun", "run mode")
-  flag.StringVar(&testFilename, "testFilename", "test.txt", "Test file")
+  flag.StringVar(&testFilename, "test_filename", "test.txt", "Test file")
+  flag.StringVar(&passengerVersion, "passenger_version", "5", "Passenger version")
 
   flag.Parse()
 
@@ -64,7 +79,7 @@ func main() {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    workers = get_passenger_workers(scanner)
+    workers = get_passenger_workers(scanner, passengerVersion)
     for _, worker := range workers {
       if worker.memory > memoryLimit {
         fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
@@ -80,7 +95,7 @@ func main() {
     }
     fmt.Printf("Terminating workers that exceed the %dMB limit\n", memoryLimit)
     scanner := bufio.NewScanner(bytes.NewReader(cmdReader))
-    workers = get_passenger_workers(scanner)
+    workers = get_passenger_workers(scanner, passengerVersion)
     for _, worker := range workers {
       if worker.memory > memoryLimit {
         fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
