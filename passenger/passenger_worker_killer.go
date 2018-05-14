@@ -18,7 +18,7 @@ type worker struct {
 }
 
 func get_kill_string(pid string) string {
-  return fmt.Sprintf("kill -6 %s", pid)
+  return fmt.Sprintf("env kill -6 %s", pid)
 }
 
 func get_worker_signature(_passengerVersion string) string {
