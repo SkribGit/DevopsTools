@@ -102,6 +102,8 @@ func main() {
     workers = get_passenger_workers(scanner, passengerVersion)
     for _, worker := range workers {
       if worker.memory > memoryLimit {
+        now := time.Now()
+        fmt.Println(now.Format("20060102150405"))
         fmt.Printf("Terminating worker with PID %s. Memory size: %d\n", worker.pid, worker.memory)
         killCmd := exec.Command("/bin/kill", "-TERM", worker.pid)
         killErr := killCmd.Run()
