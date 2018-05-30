@@ -10,6 +10,7 @@ import (
   "os/exec"
   "strconv"
   "strings"
+  "time"
 )
 
 type worker struct {
@@ -55,6 +56,7 @@ func main() {
   var runMode string
   var testFilename string
   var passengerVersion string
+  var passengerMemoryStatsPath string
 
   var workers []worker
 
@@ -62,6 +64,7 @@ func main() {
   flag.StringVar(&runMode, "mode", "dryrun", "run mode")
   flag.StringVar(&testFilename, "test_filename", "test.txt", "Test file")
   flag.StringVar(&passengerVersion, "passenger_version", "5", "Passenger version")
+  flag.StringVar(&passengerMemoryStatsPath, "passenger_memory_stats_path", "/usr/sbin/", "Path to passenger-memory-stats")
 
   flag.Parse()
 
@@ -89,7 +92,7 @@ func main() {
   } else {
     // Live mode
     // run passenger-memory-stats and parse the output of the command
-    cmd := exec.Command("passenger-memory-stats")
+    cmd := exec.Command(passengerMemoryStatsPath + "passenger-memory-stats")
     cmdReader, err := cmd.Output()
     if err != nil {
       log.Fatal(err)
