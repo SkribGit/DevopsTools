@@ -1,6 +1,6 @@
 Sample shell script:
 
-/home/rad/passenger_worker_killer -mode live -limit 400 -passenger_version 5 -passenger_memory_stat_path /usr/sbin >> /home/rad/passenger_worker_killer.log
+sudo /home/rad/passenger_worker_killer -mode live -limit 400 -passenger_version 5 -passenger_memory_stat_path /usr/sbin >> /home/rad/passenger_worker_killer.log
 
 Sample crontab entry (run every 10 minutes):
 
